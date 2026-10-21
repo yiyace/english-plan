@@ -71,7 +71,8 @@ function buildQueues() {
   (DATA.extraWords4 || []).forEach((c, i) => words.push({ id: "z" + i, en: c[0], zh: c[1], ex: c[2], deck: "A2常用词" }));
   (DATA.extraWords5 || []).forEach((c, i) => words.push({ id: "v" + i, en: c[0], zh: c[1], ex: c[2], deck: "进阶词" }));
   (DATA.extraWords6 || []).forEach((c, i) => words.push({ id: "t" + i, en: c[0], zh: c[1], ex: c[2], deck: "B1词与短语动词" }));
-  const phrases = DATA.phrases.concat(DATA.extraPhrases || [], DATA.extraPhrases3 || [], DATA.extraPhrases4 || [], DATA.extraPhrases5 || [], DATA.extraPhrases6 || []).map((c, i) => ({ id: "p" + i, en: c[0], zh: c[1], ex: "", deck: "外贸句型" }));
+  (DATA.extraWords7 || []).forEach((c, i) => words.push({ id: "s" + i, en: c[0], zh: c[1], ex: c[2], deck: "B1话题词" }));
+  const phrases = DATA.phrases.concat(DATA.extraPhrases || [], DATA.extraPhrases3 || [], DATA.extraPhrases4 || [], DATA.extraPhrases5 || [], DATA.extraPhrases6 || [], DATA.extraPhrases7 || []).map((c, i) => ({ id: "p" + i, en: c[0], zh: c[1], ex: "", deck: "外贸句型" }));
   return { words, phrases };
 }
 const Q = buildQueues();
