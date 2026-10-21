@@ -252,7 +252,7 @@ DATA.extraWords7.push(
   ["compete","竞争","We compete on quality."],
   ["advantage","优势","Our advantage is speed."],
   ["disadvantage","劣势","The disadvantage is the price."],
-  ["strength","强项","Our strength is precision."],
+  ["key strength","强项","Our key strength is precision."],
   ["weakness","弱项","My weakness is speaking."],
   ["challenge","挑战","This is a big challenge."],
   ["opportunity","机会","This is a good opportunity."],
