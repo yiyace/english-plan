@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="英语计划">
+<meta name="theme-color" content="#1f6feb">
+<link rel="manifest" href="manifest.json">
+<title>24个月英语学习计划</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--tx:#1b2430;--mu:#6b7785;--pri:#1f6feb;--ok:#1a9d55;--bad:#d83a3a;--bd:#e1e6ec}
+@media(prefers-color-scheme:dark){:root{--bg:#10151c;--card:#1a212b;--tx:#e8edf3;--mu:#93a0b0;--pri:#4a90ff;--ok:#3ecf7a;--bad:#ff6b6b;--bd:#2b3441}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.5 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;padding-bottom:84px}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 10px}h1 small{font-size:14px;color:var(--mu);font-weight:400;margin-left:6px}
+h2{font-size:18px;margin:18px 0 8px}h3{font-size:16px;margin:14px 0 6px}
+.muted{color:var(--mu);font-size:14px}.warn{color:var(--bad);font-size:14px}
+.card2,.blk{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:10px 0}
+.card2.cur{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri) inset}
+.blk{display:flex;gap:12px}.blk.done{opacity:.55}.blk p{margin:4px 0 8px;font-size:15px;color:var(--mu)}.blk i{font-style:normal;color:var(--mu);font-size:13px}
+.bt{flex:1}
+.chk input{display:none}.chk span{display:block;width:28px;height:28px;border:2px solid var(--pri);border-radius:8px;margin-top:2px}
+.chk input:checked+span{background:var(--ok);border-color:var(--ok);position:relative}
+.chk input:checked+span::after{content:"✓";color:#fff;position:absolute;left:5px;top:-2px;font-size:20px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar div{height:100%;background:var(--ok)}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 12px}
+button.sm{padding:5px 12px;font-size:14px;background:var(--pri);color:#fff;border:0}
+button.big{display:block;width:100%;padding:14px;margin-top:14px;font-size:18px;background:var(--pri);color:#fff;border:0}
+button.big.rec{background:var(--bad)}button:disabled{opacity:.5}
+button.ic{padding:4px 10px;margin-left:4px;font-size:18px}
+input,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;margin:3px 0;max-width:100%}
+textarea{width:100%}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:12px 0;color:var(--mu);font-size:13px}
+nav button.on{color:var(--pri);font-weight:700}
+.flash{text-align:center;padding:24px 14px}.flash .en{font-size:34px;font-weight:700;margin:14px 0}.flash .zh{font-size:24px;margin:18px 0 6px;color:var(--pri)}
+.flash .ex{color:var(--mu);margin-bottom:10px}.tag{font-size:12px;background:var(--bd);color:var(--mu);border-radius:6px;padding:2px 8px}
+.rate{display:flex;gap:8px;margin-top:14px}.rate button{flex:1;padding:14px 4px;color:#fff;border:0;font-size:16px}
+.r1{background:#d83a3a}.r3{background:#e08a00}.r4{background:#1f6feb}.r5{background:#1a9d55}
+.sub,.sub2{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}.sub button,.sub2 button{white-space:nowrap}
+.sub button.on,.sub2 button.on{background:var(--pri);color:#fff;border:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.ph{font-size:20px;padding:8px 0}.ph.on{background:var(--pri);color:#fff}.ph.dn{border-color:var(--ok)}
+.sym{font-size:36px;font-weight:700}.sym small{font-size:14px;color:var(--mu);font-weight:400}
+.wrow{display:flex;align-items:center;gap:4px;padding:6px 0;border-bottom:1px solid var(--bd)}.wrow>:first-child{flex:1}
+.res{margin-top:8px;font-size:18px}.res .ok,.passage .ok{color:var(--ok)}.res .bad,.passage .bad{color:var(--bad);font-weight:700}
+.passage{font-size:20px;line-height:1.8;margin-bottom:10px}
+.glist{display:flex;flex-direction:column;gap:4px;margin-top:6px}.gi{text-align:left}.gi.on{background:var(--pri);color:#fff}.gi.dn{border-color:var(--ok)}
+.chk2{display:block;margin-top:12px}.dr{margin:6px 0}.dr summary{cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:13px;color:var(--mu)}
+.stats div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 2px}.stats b{display:block;font-size:24px;color:var(--tx)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}td{padding:4px;border-bottom:1px solid var(--bd)}
+a{color:var(--pri)}
+.bigword{font-size:44px;font-weight:700;margin:10px 0}.sent{font-size:24px;font-weight:700;margin:10px 0;line-height:1.4}
+.tipbox{background:var(--bg);border-radius:10px;padding:8px 12px;text-align:left;font-size:15px}
+.actrow{display:flex;gap:8px;margin-top:12px}.actrow button{flex:1;padding:12px 4px}
+.micbtn{display:block;width:100%;margin-top:14px;padding:22px 10px;font-size:20px;font-weight:700;background:var(--pri);color:#fff;border:0;border-radius:16px}
+.micbtn.rec{background:var(--bad)}
+.verdict{margin-top:12px;padding:12px;border-radius:12px;text-align:left;font-size:17px}
+.v-ok{background:rgba(26,157,85,.15)}.v-near{background:rgba(224,138,0,.18)}.v-bad{background:rgba(216,58,58,.15)}
+audio{width:100%;margin-top:10px}
+</style>
+</head>
+<body>
+<main id="view"></main>
+<nav>
+  <button data-tab="today">📅 今日</button>
+  <button data-tab="cards">🗂 单词卡</button>
+  <button data-tab="clinic">🎤 发音</button>
+  <button data-tab="learn">🎧 练习</button>
+  <button data-tab="plan">🗺 路线</button>
+  <button data-tab="me">📊 我的</button>
+</nav>
+<script src="data.js"></script>
+<script src="pack2.js"></script>
+<script src="pack3.js"></script>
+<script src="pack4.js"></script>
+<script src="pron.js"></script>
+<script src="app.js"></script>
+<script src="clinic.js"></script>
+</body>
+</html>

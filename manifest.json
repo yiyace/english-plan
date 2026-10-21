@@ -1,0 +1,9 @@
+{
+  "name": "24个月英语学习计划",
+  "short_name": "英语计划",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#1f6feb",
+  "icons": []
+}
