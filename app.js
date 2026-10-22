@@ -11,16 +11,21 @@ const diffDays = (a, b) => Math.round((new Date(b + "T00:00:00") - new Date(a + 
 /* ---------- 状态 ---------- */
 const KEY = "eng_plan_v1";
 const DEFAULTS = () => ({ start: today(), perDay: 6, perDayPhr: 2, cards: {}, wIntro: 0, pIntro: 0, introDate: "",
-  checks: {}, pron: {}, clI: 0, logs: [], custom: [], done: { ph: {}, gr: {} } });
+  checks: {}, pron: {}, clI: 0, voice: "", logs: [], custom: [], done: { ph: {}, gr: {} } });
 let S = (() => { try { const j = JSON.parse(localStorage.getItem(KEY)); if (j) return Object.assign(DEFAULTS(), j); } catch (e) {} return DEFAULTS(); })();
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 save();
 
 /* ---------- 语音：朗读 & 识别 ---------- */
 let voice = null;
+function enVoices() { return speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); }
 function pickVoice() {
-  const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
-  voice = vs.find(v => /natural|online/i.test(v.name) && /US|GB/i.test(v.lang)) || vs.find(v => /en-US/i.test(v.lang)) || vs[0] || null;
+  const vs = enVoices();
+  voice = vs.find(v => v.name === S.voice)
+    || vs.find(v => v.localService && /en-US/i.test(v.lang))
+    || vs.find(v => v.localService)
+    || vs.find(v => /en-US/i.test(v.lang))
+    || vs[0] || null;
 }
 if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 function say(text, rate) {
@@ -302,6 +307,9 @@ function vMe() {
   <div class="card2"><h2>设置</h2>
    <p>开始日期：<input id="sdate" type="date" value="${S.start}"> <button class="sm" data-act="setdate">保存</button></p>
    <p>每天新词数：<input id="spd" type="number" min="1" max="20" value="${S.perDay}"> 句型：<input id="spp" type="number" min="0" max="10" value="${S.perDayPhr}"> <button class="sm" data-act="setper">保存</button></p></div>
+  <div class="card2"><h2>发音人</h2><p class="muted">选“本地”的声音点击后立刻出声；“在线”的更自然，但要联网生成，会有明显延迟。</p>
+   <select id="vsel">${enVoices().map(v => `<option value="${esc(v.name)}" ${voice && v.name === voice.name ? "selected" : ""}>${esc(v.name)} ${v.localService ? "（本地·快）" : "（在线·慢）"}</option>`).join("")}</select>
+   <button class="sm" data-act="voicetest">试听</button></div>
   <div class="card2"><h2>备份 / 换设备</h2><p class="muted">进度只保存在这个浏览器里。换电脑或手机时：先在旧设备“导出”，复制文字，在新设备粘贴“导入”。建议每周导出一次存到微信文件传输助手。</p>
    <button class="sm" data-act="export">导出</button> <button class="sm" data-act="import">导入</button>
    <textarea id="bk" rows="4" placeholder="这里显示或粘贴备份文字"></textarea></div>`;
@@ -328,6 +336,7 @@ document.addEventListener("click", e => {
   if (act === "cardstart") { CS.q = dueIds().sort(() => Math.random() - .5); CS.i = 0; CS.total = CS.q.length; CS.ok = 0; CS.shown = false; CS.active = true; render(); const c = CARD[CS.q[0]]; if (c) say(c.en); }
   else if (act === "reveal") { CS.shown = true; render(); }
   else if (act === "readtoggle") readToggle();
+  else if (act === "voicetest") say("Thank you for your inquiry. Please send me your drawing.", 0.95);
   else if (act === "manlog") { const v = +$("#manacc").value; S.logs.push({ type: "read", ref: RD.i, date: today(), acc: v, note: DATA.passages[RD.i].t }); save(); render(); }
   else if (act === "rclog") { const v = $("#rcacc").value; if (v === "") return; S.logs.push({ type: "coach", date: today(), acc: +v, note: $("#rcnote").value }); save(); render(); }
   else if (act === "addcard") { const en = $("#cen").value.trim(), zh = $("#czh").value.trim(); if (!en || !zh) return; addCustom(en, zh, $("#cex").value.trim()); render(); }
@@ -339,6 +348,7 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   const D = e.target.dataset;
+  if (e.target.id === "vsel") { S.voice = e.target.value; save(); pickVoice(); say("Thank you for your inquiry.", 0.95); return; }
   if (D.chk) { const t = today(); (S.checks[t] = S.checks[t] || {})[D.chk] = e.target.checked; save(); render(); }
   if (D.phdone !== undefined) { e.target.checked ? S.done.ph[D.phdone] = 1 : delete S.done.ph[D.phdone]; save(); render(); }
   if (D.grdone !== undefined) { e.target.checked ? S.done.gr[D.grdone] = 1 : delete S.done.gr[D.grdone]; save(); render(); }
