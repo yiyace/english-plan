@@ -61,6 +61,14 @@ a{color:var(--pri)}
 .verdict{margin-top:12px;padding:12px;border-radius:12px;text-align:left;font-size:17px}
 .v-ok{background:rgba(26,157,85,.15)}.v-near{background:rgba(224,138,0,.18)}.v-bad{background:rgba(216,58,58,.15)}
 audio{width:100%;margin-top:10px}
+.dictsheet{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:720px;margin:0 auto;background:var(--card);border:1px solid var(--bd);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:68vh;overflow-y:auto}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.dw{font-size:28px}.dipa{color:var(--mu);margin-left:6px}
+.dzh{font-size:22px;color:var(--pri);margin:8px 0;font-weight:700}
+.ddetail{background:var(--bg);border-radius:10px;padding:10px 12px;margin:8px 0;line-height:1.7;font-size:16px}
+.dex,.dden{margin:8px 0;font-size:16px}.dex{color:var(--mu)}
+.toast{position:fixed;left:12px;right:12px;bottom:70px;z-index:40;max-width:520px;margin:0 auto;background:#1b2430;color:#fff;border-radius:12px;padding:12px 14px;font-size:15px}
+
 .zhbox{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:10px;color:var(--mu);font-size:16px;line-height:1.7}
 .warnbox{border-color:var(--bad);background:rgba(216,58,58,.08)}
 select{font:inherit;max-width:100%;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
@@ -86,5 +94,6 @@ select{font:inherit;max-width:100%;padding:6px;border-radius:8px;border:1px soli
 <script src="pron.js"></script>
 <script src="app.js"></script>
 <script src="clinic.js"></script>
+<script src="lookup.js"></script>
 </body>
 </html>
