@@ -51,7 +51,7 @@ function vClinic() {
    ${it.tip ? `<p class="tipbox">💡 ${esc(it.tip)}</p>` : ""}
    ${hint.length ? `<p class="tipbox">${hint.map(esc).join("<br>")}</p>` : ""}
    <div class="actrow"><button data-claction="say">🔊 标准音</button><button data-claction="slow">🐢 慢速</button></div>
-   <button class="micbtn ${CL.res === "listening" ? "rec" : ""}" data-claction="score">${CL.res === "listening" ? "🎧 正在听…请说" : "🎤 说一遍，看我读得对不对"}</button>
+   <button class="micbtn ${CL.res === "listening" ? "rec" : CL.res === "preparing" ? "wait" : ""}" data-claction="score">${CL.res === "listening" ? "🎧 现在请说！" : CL.res === "preparing" ? "⏳ 麦克风准备中…先别说" : "🎤 说一遍，看我读得对不对"}</button>
    ${clResHtml(it)}
    <div class="actrow"><button data-claction="rec">${REC.on ? "⏹ 停止录音" : "⏺ 录下我的声音"}</button>${REC.url ? `<button data-claction="cmp">▶ 标准音 → 我的录音</button>` : ""}</div>
    ${REC.url ? `<audio controls src="${REC.url}"></audio>` : ""}
@@ -61,7 +61,7 @@ function vClinic() {
 }
 
 function clResHtml(it) {
-  const r = CL.res; if (!r || r === "listening") return "";
+  const r = CL.res; if (!r || r === "listening" || r === "preparing") return "";
   if (r.err) {
     const m = r.err === "no-speech" ? "没听到声音，请靠近麦克风再试。"
       : r.err === "unsupported" ? "这个浏览器不支持语音识别。电脑用 Edge / Chrome，iPhone 用 Safari（不要用主屏幕图标打开）。"
@@ -95,9 +95,11 @@ function clAction(a) {
 function clScore(it) {
   if (!SR) { CL.res = { err: "unsupported" }; return render(); }
   speechSynthesis.cancel();
-  CL.res = "listening"; render();
+  CL.res = "preparing"; render();
   const r = new SR(); r.lang = "en-US"; r.maxAlternatives = 5; r.interimResults = false; r.continuous = !!it.sent;
   let got = false;
+  r.onaudiostart = () => { if (CL.res === "preparing") { CL.res = "listening"; render(); } };
+  if (!it.sent) r.onspeechend = () => { try { r.stop(); } catch (e) {} };
   r.onresult = e => {
     got = true;
     if (it.sent) {
@@ -107,13 +109,14 @@ function clScore(it) {
       try { r.stop(); } catch (er) {} return;
     }
     const alts = Array.from(e.results[0]).map(a => ({ t: a.transcript.trim().toLowerCase().replace(/[^a-z' ]/g, ""), c: a.confidence }));
+    if (!alts[0].t) { CL.res = { err: "no-speech" }; render(); return; }
     const target = it.w.toLowerCase();
     const v = alts[0].t === target ? "ok" : alts.some(a => a.t === target) ? "near" : "bad";
     CL.res = { v, top: alts[0].t, conf: alts[0].c ? Math.round(alts[0].c * 100) : 0 };
     clStat(it.w, v === "ok"); render();
   };
   r.onerror = e => { got = true; CL.res = { err: e.error }; render(); };
-  r.onend = () => { if (!got && CL.res === "listening") { CL.res = { err: "no-speech" }; render(); } };
+  r.onend = () => { if (!got && (CL.res === "listening" || CL.res === "preparing")) { CL.res = { err: "no-speech" }; render(); } };
   try { r.start(); } catch (e) { CL.res = { err: "error" }; render(); }
   if (it.sent) setTimeout(() => { try { r.stop(); } catch (e) {} }, 15000);
 }
