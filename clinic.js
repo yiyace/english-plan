@@ -85,10 +85,12 @@ function clAction(a) {
   if (a === "rec") return clRecord();
   if (a === "score") return clScore(it);
   if (a === "cmp") {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(it.w); u.lang = "en-US"; u.rate = 0.85; if (voice) u.voice = voice;
-    u.onend = () => setTimeout(() => { try { new Audio(REC.url).play(); } catch (e) {} }, 300);
-    speechSynthesis.speak(u);
+    stopAll();
+    const after = () => setTimeout(() => { try { new Audio(REC.url).play(); } catch (e) {} }, 300);
+    const u = clipFor(it.w);
+    if (u) { playClip(u, 1).then(after); return; }
+    const ut = new SpeechSynthesisUtterance(it.w); ut.lang = "en-US"; ut.rate = 0.85; if (voice) ut.voice = voice;
+    ut.onend = after; speechSynthesis.speak(ut);
   }
 }
 

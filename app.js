@@ -28,8 +28,38 @@ function pickVoice() {
     || vs[0] || null;
 }
 if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = () => { pickVoice(); if (document.getElementById("view") && typeof render === "function") render(); }; }
+/* ---- 预先生成的真人级音频（优先），找不到才用浏览器自带语音 ---- */
+let MAN = null, manDone = false, curAudio = null, sayTok = 0;
+fetch("audio/manifest.json").then(r => r.ok ? r.json() : null).then(j => { MAN = j; if (j) j.wset = new Set(j.w); }).catch(() => {}).finally(() => { manDone = true; if (document.getElementById("view") && typeof render === "function") render(); });
+const normT = t => String(t).replace(/\s+/g, " ").trim();
+function clipFor(text) {
+  if (!MAN) return null;
+  const t = normT(text);
+  if (MAN.s[t]) return "audio/s/" + MAN.s[t] + ".mp3";
+  const w = t.toLowerCase();
+  if (MAN.wset.has(w)) return "audio/w/" + w.replace(/'/g, "_").replace(/ /g, "-") + ".mp3";
+  return null;
+}
+function stopAll() { sayTok++; try { speechSynthesis.cancel(); } catch (e) {} if (curAudio) { try { curAudio.pause(); } catch (e) {} curAudio = null; } }
+function playClip(url, rate) {
+  return new Promise(res => {
+    const a = new Audio(url); a.playbackRate = rate || 1; a.preservesPitch = true;
+    a.onended = () => res(true); a.onerror = () => res(false);
+    curAudio = a; a.play().catch(() => res(false));
+  });
+}
 function say(text, rate) {
-  if (!("speechSynthesis" in window)) return alert("此浏览器不支持语音朗读，请用 Edge / Chrome / Safari。");
+  stopAll(); const tok = sayTok;
+  const t = normT(text), rt = rate && rate < 0.8 ? 0.7 : 1;
+  let urls = null;
+  const whole = clipFor(t);
+  if (whole) urls = [whole];
+  else { const parts = (t.match(/[^.!?]+[.!?]*/g) || [t]).map(p => p.trim()).filter(Boolean); const us = parts.map(clipFor); if (us.length && us.every(Boolean)) urls = us; }
+  if (!urls) return ttsSay(t, rate);
+  (async () => { for (const u of urls) { if (tok !== sayTok) return; const ok = await playClip(u, rt); if (ok === false) { if (tok === sayTok) ttsSay(t, rate); return; } } })();
+}
+function ttsSay(text, rate) {
+  if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const parts = (String(text).match(/[^.!?]+[.!?]*/g) || [String(text)]).map(p => p.trim()).filter(Boolean);
   setTimeout(() => {
@@ -44,7 +74,7 @@ function say(text, rate) {
 const hasEnglishVoice = () => enVoices().length > 0;
 const hasLocalEnglish = () => enVoices().some(v => v.localService);
 function voiceTip() {
-  if (!("speechSynthesis" in window) || hasLocalEnglish()) return "";
+  if (!manDone || MAN || !("speechSynthesis" in window) || hasLocalEnglish()) return "";
   return `<div class="card2 warnbox"><b>⚠ 这台电脑没有安装英语语音包</b>
   <p>现在听到的声音要么很慢（在线声音），要么根本没声音。免费安装只需 1 分钟：</p>
   <p>Windows 设置 → 时间和语言 → 语音 → <b>添加语音</b> → 搜索“English (United States)” → 安装。装好后<b>重启本窗口</b>，再到“我的 → 发音人”里选 David / Zira / Mark。</p></div>`;
