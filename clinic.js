@@ -34,10 +34,11 @@ function hintFor(w) {
 }
 
 function vClinic() {
-  const ms = [["pairs", "易混词"], ["weak", "我的弱项"], ["sent", "句子"]];
+  const ms = [["hvpt", "听辨训练"], ["pairs", "易混词"], ["weak", "我的弱项"], ["sent", "句子"]];
   const tabs = `<div class="sub">${ms.map(m => `<button class="${CL.mode === m[0] ? "on" : ""}" data-clmode="${m[0]}">${m[1]}</button>`).join("")}</div>`;
   const d = dayIdx(), pi = (d - 1) % 44, p = DATA.phonemes[pi];
   const top = `<div class="card2"><b>今日重点音 /${esc(p[0])}/</b> <span class="muted">${esc(p[1])}</span><p class="muted">${esc(p[2])} <button class="sm" data-go='["learn","phonics",${pi}]'>看例词</button></p></div>`;
+  if (CL.mode === "hvpt") return `<h1>发音诊所</h1>${tabs}` + vHv();
   const it = clCur();
   if (!it) return `<h1>发音诊所</h1>${tabs}${top}<div class="card2"><p>还没有弱项记录。先在“易混词”里多练几个，错得多的词会自动出现在这里。</p></div>`;
   const total = clItems().length;

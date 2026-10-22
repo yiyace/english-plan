@@ -61,6 +61,19 @@ a{color:var(--pri)}
 .verdict{margin-top:12px;padding:12px;border-radius:12px;text-align:left;font-size:17px}
 .v-ok{background:rgba(26,157,85,.15)}.v-near{background:rgba(224,138,0,.18)}.v-bad{background:rgba(216,58,58,.15)}
 audio{width:100%;margin-top:10px}
+.sp{display:inline-block;min-width:38px;text-align:center;font-size:12px;border-radius:6px;padding:2px 6px;margin-top:3px;background:var(--bd);color:var(--mu)}
+.sp.Y{background:var(--pri);color:#fff}
+.dl{display:flex;gap:8px;align-items:flex-start;padding:10px 6px;border-bottom:1px solid var(--bd);border-radius:8px}
+.dl .dtxt{flex:1;line-height:1.5}.dl.playing{background:rgba(31,111,235,.14)}.star{color:#e08a00}
+.runbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--pri);color:#fff;border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:14px}
+.runbar .muted{color:rgba(255,255,255,.85)}.runbar button.sm{background:#fff;color:var(--pri)}
+button.sm2{padding:4px 10px;font-size:13px}
+.hvrow{display:flex;gap:12px;margin:14px 0}.hvbtn{flex:1;padding:26px 6px;font-size:30px;font-weight:700;border-radius:16px}
+.hvbtn.okb{background:var(--ok);color:#fff;border-color:var(--ok)}.hvbtn.badb{background:var(--bad);color:#fff;border-color:var(--bad)}
+.zhbig{font-size:28px;font-weight:700;margin:16px 0;color:var(--pri)}
+ol.method{padding-left:20px;line-height:1.7;font-size:15px}ol.method li{margin-bottom:8px}
+.flash textarea{width:100%;font-size:18px}
+
 .dictsheet{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:720px;margin:0 auto;background:var(--card);border:1px solid var(--bd);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:68vh;overflow-y:auto}
 .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .dw{font-size:28px}.dipa{color:var(--mu);margin-left:6px}
@@ -81,7 +94,7 @@ select{font:inherit;max-width:100%;padding:6px;border-radius:8px;border:1px soli
   <button data-tab="cards">🗂 单词卡</button>
   <button data-tab="clinic">🎤 发音</button>
   <button data-tab="learn">🎧 练习</button>
-  <button data-tab="plan">🗺 路线</button>
+  <button data-tab="lab">🎧 听力</button>
   <button data-tab="me">📊 我的</button>
 </nav>
 <script src="data.js"></script>
@@ -92,8 +105,10 @@ select{font:inherit;max-width:100%;padding:6px;border-radius:8px;border:1px soli
 <script src="pack6.js"></script>
 <script src="pack7.js"></script>
 <script src="pron.js"></script>
+<script src="dialogues.js"></script>
 <script src="app.js"></script>
 <script src="clinic.js"></script>
 <script src="lookup.js"></script>
+<script src="lab.js"></script>
 </body>
 </html>

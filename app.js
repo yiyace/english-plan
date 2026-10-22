@@ -11,7 +11,7 @@ const diffDays = (a, b) => Math.round((new Date(b + "T00:00:00") - new Date(a + 
 /* ---------- 状态 ---------- */
 const KEY = "eng_plan_v1";
 const DEFAULTS = () => ({ start: today(), perDay: 6, perDayPhr: 2, cards: {}, wIntro: 0, pIntro: 0, introDate: "",
-  checks: {}, pron: {}, clI: 0, voice: "", logs: [], custom: [], done: { ph: {}, gr: {} } });
+  checks: {}, pron: {}, clI: 0, lab: {}, hv: {}, voice: "", logs: [], custom: [], done: { ph: {}, gr: {} } });
 let S = (() => { try { const j = JSON.parse(localStorage.getItem(KEY)); if (j) return Object.assign(DEFAULTS(), j); } catch (e) {} return DEFAULTS(); })();
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 save();
@@ -130,6 +130,7 @@ function rebuildIndex() {
   Object.keys(CARD).forEach(k => delete CARD[k]);
   Q.words.concat(Q.phrases).forEach(c => CARD[c.id] = c);
   S.custom.forEach(c => CARD[c.id] = c);
+  (DATA.dialogues || []).forEach((dl, di) => dl.k.forEach(k => { const l = dl.lines[k]; CARD["g" + di + "_" + k] = { id: "g" + di + "_" + k, en: l[1], zh: l[2], ex: "", deck: "对话句型" }; }));
 }
 rebuildIndex();
 
@@ -178,13 +179,22 @@ function blocks(d) {
   const evCards = { id: "e1", min: 10, t: "复习到期的卡片", d: "晚上再过一遍当天新词，记忆更牢。", go: ["cards"] };
   const evPhr = { id: "e2", min: 10, t: "外贸句型跟读", d: "点 🔊 听，再点 🎤 跟读，看分数。", go: ["learn", "phrases"] };
   if (ph <= 1) {
-    M.push({ id: "m1", min: 20, t: ph === 0 ? `发音：/${p[0]}/（${p[1]}）` : `发音回顾：/${p[0]}/ + 行业词发音`, d: ph === 0 ? p[2] : "复习这个音，再把 5 个行业词读准。不确定就听 Cambridge Dictionary 发音。", go: ["clinic"] });
-    M.push(cardB);
-    M.push({ id: "m3", min: 20, t: `语法：第 ${gi + 1} 课 ${DATA.grammar[gi].t.replace(/^\d+ /, "")}`, d: `第 ${gs + 1}/4 天：${GSTEPS[gs]}`, go: ["learn", "grammar", gi] });
-    M.push({ id: "m4", min: 20, t: "听力 + 跟读", d: ph === 0 ? "VOA Learning English 或 Rachel's English：选 1–2 分钟，听 3 遍，再逐句跟读。" : "BBC English at Work / VOA 中级：选一小段，听写关键词，再影子跟读（听到一句，马上模仿一句）。", go: ["plan"] });
-    M.push(read);
-    E.push(evCards, evPhr);
-    E.push({ id: "e3", min: 10, t: "输出任务", d: (ph === 0 ? OUT0 : OUT1)[d % (ph === 0 ? OUT0 : OUT1).length] });
+    const N = (DATA.dialogues || []).length, di = (d - 1) % N, di1 = (d - 2 + N) % N, round = Math.floor((d - 1) / N);
+    const dl = DATA.dialogues[di], kl = dl.lines[dl.k[0]][1];
+    const note = round === 0 ? "" : "（第 " + (round + 1) + " 轮：这次尽量不看原文）";
+    M.push({ id: "m1", min: 10, t: "听辨训练：20 题", d: "先练耳朵：听一个词，选是哪个。每题换一个人的声音。耳朵分得清，嘴巴才读得准。", go: ["clinic", "hvpt"] });
+    M.push({ id: "m2", min: 10, t: `发音：/${p[0]}/ + 弱项词`, d: `${p[2]} 然后练你的弱项词（对着镜子看口型）。`, go: ["clinic", "pairs"] });
+    M.push({ id: "m3", min: 25, t: `精听①②：${dl.t}${note}`, d: "第一步：不看文字，听 2–3 遍，试着回答问题。第二步：看原文和中文，弄懂每一句。", go: ["lab", di, "blind"] });
+    M.push({ id: "m4", min: 20, t: "精听③④：跟读 + 听写", d: "逐句跟读并看评分；再听写 5 句，找出你听不出来的地方。", go: ["lab", di, "shadow"] });
+    M.push({ id: "m5", min: 15, t: "单词卡：新词 + 复习", d: "新卡片看词听音；老卡片会变成填空和中译英：要想出来，不是看出来。", go: ["cards"] });
+    M.push(sun
+      ? { id: "m6", min: 10, t: "周测：朗读并记录准确率", d: "选一篇没读熟的，朗读并看准确率。目标：比上周高。", go: ["learn", "read", ri] }
+      : { id: "m6", min: 10, t: `语法：第 ${gi + 1} 课 ${DATA.grammar[gi].t.replace(/^\d+ /, "")}`, d: `第 ${gs + 1}/4 天：${GSTEPS[gs]}`, go: ["learn", "grammar", gi] });
+    E.push({ id: "e1", min: 10, t: "复习到期的卡片", d: "晚上再过一遍，记忆更牢。", go: ["cards"] });
+    E.push({ id: "e2", min: 10, t: `重听昨天的对话：${DATA.dialogues[di1].t}`, d: "盲听一遍，不看原文，检查自己还能听懂多少。", go: ["lab", di1, "blind"] });
+    E.push({ id: "e3", min: 10, t: "输出任务", d: sun
+      ? "把这周写的句子整理好，发给 Claude 请它逐句批改，并把错误记在本子上。"
+      : `用对话里的“${kl}”造 2 个关于你自己工作的新句子，写下来并大声读 3 遍。` });
   } else if (ph === 2) {
     M.push({ id: "m1", min: 20, t: "口语：跟读 + 录音自评", d: "选一段 1 分钟英文，影子跟读 3 遍；最后一遍用手机录音，回听找出 3 个问题。", go: ["learn", "phrases"] });
     M.push(cardB);
@@ -232,7 +242,7 @@ function go(tab, sub, arg) { V.tab = tab; if (sub !== undefined) V.sub = sub; if
 function render() {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === V.tab));
   const el = $("#view");
-  el.innerHTML = ({ today: vToday, cards: vCards, clinic: vClinic, learn: vLearn, plan: vPlan, me: vMe })[V.tab]();
+  el.innerHTML = (typeof runBar === "function" ? runBar() : "") + ({ today: vToday, cards: vCards, clinic: vClinic, learn: vLearn, plan: vPlan, me: vMe, lab: vLab, task: vTask })[V.tab]();
 }
 
 function vToday() {
@@ -245,11 +255,22 @@ function vToday() {
   return voiceTip() + `<h1>第 ${d} 天 <small>第 ${monthOf(d)} 个月 · ${names[ph]}阶段</small></h1>
   <div class="bar"><div style="width:${Math.round(done / total * 100)}%"></div></div>
   <p class="muted">今日完成 ${done} / ${total} 分钟 · 连续打卡 ${streak()} 天</p>
+  <button class="big" data-run="start">▶ 开始今日训练（一键引导）</button>
+  <p class="muted"><button class="sm2" data-go='["plan"]'>路线图与学习方法</button> 不想一键引导，也可以在下面自己选着做。</p>
   <h2>☀ 上午（90 分钟）</h2>${M.map(row).join("")}
   <h2>🌙 晚上（30 分钟）</h2>${E.map(row).join("")}
   <p class="muted">小提示：每天的任务不要拖到明天。只要做完，哪怕只有一半时间，也好过不开始。</p>`;
 }
 
+function clozeRe(c) { const w = c.en.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); return new RegExp("\\b" + w + "(?:s|es|ed|d|ing)?\\b", "i"); }
+function clozeOf(c) { return c.ex.replace(clozeRe(c), "_____"); }
+function cardMode(id) {
+  const c = CARD[id], st = S.cards[id];
+  if (!c || !st || st.rep < 2) return "recog";
+  if (c.deck === "外贸句型" || c.deck === "对话句型") return "prod";
+  if (c.ex && clozeRe(c).test(c.ex)) return "cloze";
+  return "prod";
+}
 function vCards() {
   if (!CS.active) {
     const nNew = introduceNew(); const due = dueIds().length;
@@ -262,14 +283,22 @@ function vCards() {
     CS.active = false;
     return `<h1>完成 🎉</h1><div class="card2"><p>本轮完成 ${CS.total} 张，记得 ${CS.ok} 张。</p><button class="big" data-go='["today"]'>回到今日计划</button></div>`;
   }
-  const id = CS.q[CS.i], c = CARD[id];
+  const id = CS.q[CS.i], c = CARD[id], mode = cardMode(id);
   const left = CS.q.length - CS.i;
+  const modeName = { recog: "认读", cloze: "填空（想出这个词）", prod: "中译英（想出英文）" }[mode];
+  let front = "";
+  if (mode === "recog") front = `<div class="en">${esc(c.en)}</div><div><button class="ic" data-say="${esc(c.en)}">🔊</button><button class="ic" data-say-slow="${esc(c.en)}">🐢</button></div>`;
+  else if (mode === "cloze") front = `<div class="sent">${esc(clozeOf(c))}</div><p class="muted">提示：${esc(c.zh)}</p><p class="muted">想一想：空格里该填哪个英文词？</p>`;
+  else front = `<div class="zhbig">${esc(c.zh)}</div><p class="muted">用英语怎么说？先想，再点“显示答案”。</p>`;
+  let back = "";
+  if (CS.shown) {
+    if (mode === "recog") back = `<div class="zh">${esc(c.zh)}</div>${c.ex ? `<div class="ex">${esc(c.ex)} <button class="ic" data-say="${esc(c.ex)}">🔊</button></div>` : ""}`;
+    else back = `<div class="en">${esc(c.en)}</div><div class="zh">${esc(c.zh)}</div>${c.ex ? `<div class="ex">${esc(c.ex)}</div>` : ""}<div><button class="ic" data-say="${esc(c.ex || c.en)}">🔊</button><button class="ic" data-say-slow="${esc(c.ex || c.en)}">🐢</button></div>`;
+  }
   return `<h1>单词卡 <small>剩 ${left} 张</small></h1>
-  <div class="card2 flash"><span class="tag">${esc(c.deck || "自定义")}</span>
-   <div class="en">${esc(c.en)}</div>
-   <div><button class="ic" data-say="${esc(c.en)}">🔊</button><button class="ic" data-say-slow="${esc(c.en)}">🐢</button></div>
-   ${CS.shown ? `<div class="zh">${esc(c.zh)}</div>${c.ex ? `<div class="ex">${esc(c.ex)} <button class="ic" data-say="${esc(c.ex)}">🔊</button></div>` : ""}
-   <div class="rate"><button class="r1" data-rate="1">忘了</button><button class="r3" data-rate="3">模糊</button><button class="r4" data-rate="4">记得</button><button class="r5" data-rate="5">很熟</button></div>`
+  <div class="card2 flash"><span class="tag">${esc(c.deck || "自定义")}</span> <span class="tag">${modeName}</span>
+   ${front}${back}
+   ${CS.shown ? `<div class="rate"><button class="r1" data-rate="1">忘了</button><button class="r3" data-rate="3">模糊</button><button class="r4" data-rate="4">记得</button><button class="r5" data-rate="5">很熟</button></div>`
    : `<button class="big" data-act="reveal">显示答案</button>`}
   </div>`;
 }
@@ -326,7 +355,7 @@ function vPhrases() {
 
 function vPlan() {
   const d = dayIdx(), ph = phaseOf(d);
-  return `<h1>24 个月路线图</h1><p class="muted">今天是第 ${d} 天（共约 730 天），第 ${monthOf(d)} 个月。</p>` +
+  return (typeof methodCard === "function" ? methodCard() : "") + `<h1>24 个月路线图</h1><p class="muted">今天是第 ${d} 天（共约 730 天），第 ${monthOf(d)} 个月。</p>` +
    DATA.roadmap.map((r, i) => `<div class="card2 ${i === ph ? "cur" : ""}"><h2>${esc(r.name)} ${i === ph ? "<span class='tag'>当前</span>" : ""}</h2><p><b>${esc(r.level)}</b></p>
    <ul>${r.goals.map(g => `<li>${esc(g)}</li>`).join("")}</ul><p>🎯 <b>重点：</b>${esc(r.focus)}</p><p>✅ <b>阶段检测：</b>${esc(r.test)}</p></div>`).join("") +
    `<h2>免费资源（无需付费/绑卡）</h2>` + DATA.resources.map(r => `<div class="card2"><a href="${r.u}" target="_blank" rel="noopener">${esc(r.n)}</a><p class="muted">${esc(r.d)}</p></div>`).join("") +
@@ -373,13 +402,13 @@ document.addEventListener("click", e => {
   if (D.ph !== undefined) { V.arg = +D.ph; PH.res = ""; return render(); }
   if (D.gr !== undefined) { V.arg = +D.gr; return render(); }
   if (D.rd !== undefined) { RD.i = +D.rd; RD.res = null; RD.live = ""; return render(); }
-  if (D.rate) { grade(CS.q[CS.i], +D.rate); if (+D.rate >= 4) CS.ok++; if (+D.rate < 3) CS.q.push(CS.q[CS.i]); CS.i++; CS.shown = false; render(); const nc = CARD[CS.q[CS.i]]; if (nc) say(nc.en); return; }
+  if (D.rate) { grade(CS.q[CS.i], +D.rate); if (+D.rate >= 4) CS.ok++; if (+D.rate < 3) CS.q.push(CS.q[CS.i]); CS.i++; CS.shown = false; render(); const nc = CARD[CS.q[CS.i]]; if (nc && cardMode(CS.q[CS.i]) === "recog") say(nc.en); return; }
   if (D.clmode) { CL.mode = D.clmode; CL.i = CL.mode === "pairs" ? S.clI : 0; CL.res = null; return render(); }
   if (D.clnav) { CL.i = Math.max(0, CL.i + +D.clnav); if (CL.mode === "pairs") { S.clI = CL.i; save(); } CL.res = null; return render(); }
   if (D.claction) return clAction(D.claction);
   const act = D.act; if (!act) return;
-  if (act === "cardstart") { CS.q = dueIds().sort(() => Math.random() - .5); CS.i = 0; CS.total = CS.q.length; CS.ok = 0; CS.shown = false; CS.active = true; render(); const c = CARD[CS.q[0]]; if (c) say(c.en); }
-  else if (act === "reveal") { CS.shown = true; render(); }
+  if (act === "cardstart") { CS.q = dueIds().sort(() => Math.random() - .5); CS.i = 0; CS.total = CS.q.length; CS.ok = 0; CS.shown = false; CS.active = true; render(); const c = CARD[CS.q[0]]; if (c && cardMode(CS.q[0]) === "recog") say(c.en); }
+  else if (act === "reveal") { CS.shown = true; render(); const cc = CARD[CS.q[CS.i]]; if (cc && cardMode(CS.q[CS.i]) !== "recog") say(cc.ex || cc.en); }
   else if (act === "readtoggle") readToggle();
   else if (act === "zhtoggle") { S.showZh = S.showZh === false; save(); render(); }
   else if (act === "voicetest") say("Thank you for your inquiry. Please send me your drawing.", 0.95);
