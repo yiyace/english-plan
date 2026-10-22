@@ -27,13 +27,27 @@ function pickVoice() {
     || vs.find(v => /en-US/i.test(v.lang))
     || vs[0] || null;
 }
-if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = () => { pickVoice(); if (document.getElementById("view") && typeof render === "function") render(); }; }
 function say(text, rate) {
   if (!("speechSynthesis" in window)) return alert("此浏览器不支持语音朗读，请用 Edge / Chrome / Safari。");
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US"; u.rate = rate || 0.9; if (voice) u.voice = voice;
-  speechSynthesis.speak(u);
+  const parts = (String(text).match(/[^.!?]+[.!?]*/g) || [String(text)]).map(p => p.trim()).filter(Boolean);
+  setTimeout(() => {
+    speechSynthesis.resume();
+    parts.forEach(p => {
+      const u = new SpeechSynthesisUtterance(p);
+      u.lang = "en-US"; u.rate = rate || 0.9; if (voice) u.voice = voice;
+      speechSynthesis.speak(u);
+    });
+  }, 80);
+}
+const hasEnglishVoice = () => enVoices().length > 0;
+const hasLocalEnglish = () => enVoices().some(v => v.localService);
+function voiceTip() {
+  if (!("speechSynthesis" in window) || hasLocalEnglish()) return "";
+  return `<div class="card2 warnbox"><b>⚠ 这台电脑没有安装英语语音包</b>
+  <p>现在听到的声音要么很慢（在线声音），要么根本没声音。免费安装只需 1 分钟：</p>
+  <p>Windows 设置 → 时间和语言 → 语音 → <b>添加语音</b> → 搜索“English (United States)” → 安装。装好后<b>重启本窗口</b>，再到“我的 → 发音人”里选 David / Zira / Mark。</p></div>`;
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 function listen(cb) {
@@ -198,7 +212,7 @@ function vToday() {
   const row = b => `<div class="blk ${checked(t, b.id) ? "done" : ""}">
     <label class="chk"><input type="checkbox" data-chk="${b.id}" ${checked(t, b.id) ? "checked" : ""}><span></span></label>
     <div class="bt"><b>${esc(b.t)}</b> <i>${b.min}分钟</i><p>${esc(b.d)}</p>${b.go ? `<button class="sm" data-go='${JSON.stringify(b.go)}'>去练习 →</button>` : ""}</div></div>`;
-  return `<h1>第 ${d} 天 <small>第 ${monthOf(d)} 个月 · ${names[ph]}阶段</small></h1>
+  return voiceTip() + `<h1>第 ${d} 天 <small>第 ${monthOf(d)} 个月 · ${names[ph]}阶段</small></h1>
   <div class="bar"><div style="width:${Math.round(done / total * 100)}%"></div></div>
   <p class="muted">今日完成 ${done} / ${total} 分钟 · 连续打卡 ${streak()} 天</p>
   <h2>☀ 上午（90 分钟）</h2>${M.map(row).join("")}
@@ -307,7 +321,7 @@ function vMe() {
   <div class="card2"><h2>设置</h2>
    <p>开始日期：<input id="sdate" type="date" value="${S.start}"> <button class="sm" data-act="setdate">保存</button></p>
    <p>每天新词数：<input id="spd" type="number" min="1" max="20" value="${S.perDay}"> 句型：<input id="spp" type="number" min="0" max="10" value="${S.perDayPhr}"> <button class="sm" data-act="setper">保存</button></p></div>
-  <div class="card2"><h2>发音人</h2><p class="muted">选“本地”的声音点击后立刻出声；“在线”的更自然，但要联网生成，会有明显延迟。</p>
+  <div class="card2"><h2>发音人</h2>${voiceTip()}<p class="muted">选“本地”的声音点击后立刻出声；“在线”的更自然，但要联网生成，会有明显延迟。</p>
    <select id="vsel">${enVoices().map(v => `<option value="${esc(v.name)}" ${voice && v.name === voice.name ? "selected" : ""}>${esc(v.name)} ${v.localService ? "（本地·快）" : "（在线·慢）"}</option>`).join("")}</select>
    <button class="sm" data-act="voicetest">试听</button></div>
   <div class="card2"><h2>备份 / 换设备</h2><p class="muted">进度只保存在这个浏览器里。换电脑或手机时：先在旧设备“导出”，复制文字，在新设备粘贴“导入”。建议每周导出一次存到微信文件传输助手。</p>
