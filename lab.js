@@ -185,7 +185,8 @@ function hvChoose(ix) {
   const ok = ix === t.target, h = S.hv[t.pi] || (S.hv[t.pi] = { n: 0, ok: 0 });
   h.n++; if (ok) h.ok++; HV.n++; if (ok) HV.ok++; else HV.wrong[t.pi] = (HV.wrong[t.pi] || 0) + 1;
   HV.fb = { ok, chosen: ix }; save(); render();
-  if (ok) setTimeout(() => { if (HV.trial === t) hvAdvance(); }, 900); else hvBoth();
+  if (ok) (async () => { await hvPlay(); if (HV.trial === t) setTimeout(() => { if (HV.trial === t && HV.fb) hvAdvance(); }, 600); })();
+  else hvBoth();
 }
 function hvAdvance() { if (HV.n >= HV.N) { HV.done = true; HV.trial = null; } else hvNew(); render(); }
 function vHv() {
@@ -205,7 +206,7 @@ function vHv() {
   return `<div class="card2 flash"><span class="tag">第 ${HV.n + 1} / ${HV.N} 题 · 正确 ${HV.ok}</span>
    <p><b>听一个词，选你听到的是哪一个</b><br><span class="muted">每一题都会换一个人的声音。分不清很正常，多练几次耳朵就会变灵。</span></p>
    <div class="hvrow">${btns}</div>
-   ${fb ? `<div class="verdict ${fb.ok ? "v-ok" : "v-bad"}">${fb.ok ? "✅ 对了" : "❌ 不对：刚才读的是 <b>" + esc(pr[t.target]) + "（" + esc(zhOf(pr[t.target])) + "）</b>"}<p class="muted">${esc(pr[2])}</p></div>
+   ${fb ? `<div class="verdict ${fb.ok ? "v-ok" : "v-bad"}">${fb.ok ? "✅ 对了：<b>" + esc(pr[t.target]) + "</b>（" + esc(zhOf(pr[t.target])) + "）——再读一遍给你听" : "❌ 不对：刚才读的是 <b>" + esc(pr[t.target]) + "（" + esc(zhOf(pr[t.target])) + "）</b>"}<p class="muted">${esc(pr[2])}</p></div>
      ${fb.ok ? "" : `<div class="actrow"><button data-hva="both">🔊 再对比听一遍</button><button data-hva="next">下一题 →</button></div>`}`
    : `<button class="micbtn" data-hva="replay">▶ 再听一次</button>`}
   </div>`;
