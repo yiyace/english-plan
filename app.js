@@ -314,7 +314,7 @@ function vPhonics() {
   const grid = DATA.phonemes.map((x, k) => `<button class="ph ${k === i ? "on" : ""} ${S.done.ph[k] ? "dn" : ""}" data-ph="${k}">${esc(x[0])}</button>`).join("");
   return `<h1>44 个音标 <small>已掌握 ${Object.keys(S.done.ph).length}/44</small></h1><div class="grid">${grid}</div>
   <div class="card2"><div class="sym">/${esc(p[0])}/ <small>${esc(p[1])}</small></div><p>${esc(p[2])}</p>
-  ${p[3].map(w => `<div class="wrow"><b>${esc(w)}</b><button class="ic" data-say="${esc(w)}">🔊</button><button class="ic" data-say-slow="${esc(w)}">🐢</button><button class="ic" data-speak="${esc(w)}" data-out="pho">🎤</button></div>`).join("")}
+  ${p[3].map(w => `<div class="wrow"><b>${esc(w)}</b> <span class="muted">${esc(zhOf(w))}</span><button class="ic" data-say="${esc(w)}">🔊</button><button class="ic" data-say-slow="${esc(w)}">🐢</button><button class="ic" data-speak="${esc(w)}" data-out="pho">🎤</button></div>`).join("")}
   <div id="pho" class="res">${PH.res || ""}</div>
   <label class="chk2"><input type="checkbox" data-phdone="${i}" ${S.done.ph[i] ? "checked" : ""}> 我已经能读准这个音</label></div>
   <p class="muted">口型提示：对着镜子看自己的嘴型，对比 Cambridge Dictionary 或 Rachel's English 的视频。单词识别用的是手机/浏览器自带语音识别，仅供参考。</p>`;

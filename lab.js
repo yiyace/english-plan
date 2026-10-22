@@ -26,6 +26,12 @@ const _stop = stopAll;
 stopAll = function () { lbTok++; _stop(); };
 
 /* ---- 小工具 ---- */
+function zhOf(w) {
+  const k = String(w).toLowerCase();
+  if (DATA.wordZh && DATA.wordZh[k]) return DATA.wordZh[k];
+  try { const L = localLookup(k); if (L.card && L.card.zh) return L.card.zh; if (L.func) return L.func[0]; } catch (e) {}
+  return "";
+}
 const dlgUrl = (di, li) => "audio/d/" + di + "_" + li + ".mp3";
 const NDLG = () => (DATA.dialogues || []).length;
 const todayDlg = () => (dayIdx() - 1) % NDLG();
@@ -195,11 +201,11 @@ function vHv() {
   }
   if (!HV.trial) hvNew();
   const t = HV.trial, pr = pairs[t.pi], fb = HV.fb;
-  const btns = t.order.map(ix => `<button class="hvbtn ${fb ? (ix === t.target ? "okb" : ix === fb.chosen ? "badb" : "") : ""}" data-hvc="${ix}" ${fb ? "disabled" : ""}>${esc(pr[ix])}</button>`).join("");
+  const btns = t.order.map(ix => `<button class="hvbtn ${fb ? (ix === t.target ? "okb" : ix === fb.chosen ? "badb" : "") : ""}" data-hvc="${ix}" ${fb ? "disabled" : ""}>${esc(pr[ix])}<small>${esc(zhOf(pr[ix]))}</small></button>`).join("");
   return `<div class="card2 flash"><span class="tag">第 ${HV.n + 1} / ${HV.N} 题 · 正确 ${HV.ok}</span>
    <p><b>听一个词，选你听到的是哪一个</b><br><span class="muted">每一题都会换一个人的声音。分不清很正常，多练几次耳朵就会变灵。</span></p>
    <div class="hvrow">${btns}</div>
-   ${fb ? `<div class="verdict ${fb.ok ? "v-ok" : "v-bad"}">${fb.ok ? "✅ 对了" : "❌ 不对：刚才读的是 <b>" + esc(pr[t.target]) + "</b>"}<p class="muted">${esc(pr[2])}</p></div>
+   ${fb ? `<div class="verdict ${fb.ok ? "v-ok" : "v-bad"}">${fb.ok ? "✅ 对了" : "❌ 不对：刚才读的是 <b>" + esc(pr[t.target]) + "（" + esc(zhOf(pr[t.target])) + "）</b>"}<p class="muted">${esc(pr[2])}</p></div>
      ${fb.ok ? "" : `<div class="actrow"><button data-hva="both">🔊 再对比听一遍</button><button data-hva="next">下一题 →</button></div>`}`
    : `<button class="micbtn" data-hva="replay">▶ 再听一次</button>`}
   </div>`;

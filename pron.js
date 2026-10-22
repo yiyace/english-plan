@@ -57,3 +57,29 @@ DATA.pairs = [
   ["rice","rise","词尾 /s/ 与 /z/。","词尾"],
   ["batch","badge","batch /tʃ/ 清；badge /dʒ/ 振动。batch（批次）常用。","行业"]
 ];
+
+// 易混词、发音例词的中文意思（小写键）
+DATA.wordZh = {
+ "ship":"船；运输","sheep":"绵羊","sit":"坐","seat":"座位","live":"生活；居住","leave":"离开","bit":"一点；钻头","beat":"打；节拍",
+ "steel":"钢","still":"仍然；静止的","sheet":"板材；床单","bed":"床","bad":"坏的","pen":"笔","pan":"平底锅","men":"男人们","man":"男人",
+ "cut":"切；切削","cat":"猫","cup":"杯子","cap":"帽子；盖","bus":"公交车","boss":"老板","luck":"运气","lock":"锁",
+ "full":"满的","fool":"傻瓜","pull":"拉","pool":"水池；游泳池","work":"工作","walk":"走路","shot":"一枪；一针","short":"短的",
+ "pot":"锅；罐","port":"港口","part":"零件；部分","pat":"轻拍","think":"想；认为","sink":"水槽；下沉","thank":"感谢","tank":"罐；坦克",
+ "three":"三","free":"免费的；自由的","thread":"螺纹；线","tread":"踩；胎面","then":"然后","den":"兽穴","they":"他们","day":"天",
+ "mouth":"嘴","mouse":"老鼠；鼠标","very":"非常","wary":"谨慎的","vine":"藤蔓","wine":"葡萄酒","bolt":"螺栓","volt":"伏特",
+ "vest":"背心","west":"西方","light":"光；轻的","right":"对的；右边","long":"长的","wrong":"错的","lead":"引导；铅","read":"读",
+ "late":"晚的；迟到","rate":"比率；速率","night":"夜晚","no":"不；没有","low":"低的","sip":"小口喝","she":"她","see":"看见",
+ "chair":"椅子","share":"分享","cheap":"便宜的","jeep":"吉普车","zoo":"动物园","sue":"苏（人名）","back":"背部；后面","bag":"包",
+ "white":"白色的","wide":"宽的","price":"价格","prize":"奖品；奖","rope":"绳子","robe":"长袍","tap":"攻丝；水龙头","tab":"标签",
+ "cab":"出租车","seed":"种子","rice":"大米","rise":"上升","batch":"批次","badge":"徽章",
+ "green":"绿色","machine":"机器","big":"大的","plastic":"塑料","number":"数字","large":"大的","hot":"热的","box":"盒子",
+ "door":"门","push":"推","blue":"蓝色","food":"食物","early":"早的","about":"关于；大约","supplier":"供应商","problem":"问题",
+ "paper":"纸","coin":"硬币","oil":"油","now":"现在","out":"外面","note":"笔记；注意","only":"只有","ear":"耳朵","near":"近的",
+ "here":"这里","air":"空气","care":"关心；小心","tour":"旅行；参观","pure":"纯的","sure":"确定的","pay":"付款","job":"工作；任务",
+ "ten":"十","drawing":"图纸","gauge":"量规","four":"四","factory":"工厂","finish":"完成；表面处理","video":"视频","service":"服务",
+ "size":"尺寸","process":"工艺；过程","zero":"零","please":"请","quizzes":"小测验","usual":"通常的","measure":"测量","vision":"视力；愿景",
+ "he":"他","how":"怎样","hole":"孔","chip":"芯片；切屑","much":"许多","jig":"夹具","change":"改变","make":"制造；做","time":"时间",
+ "new":"新的","thing":"东西","small":"小的","red":"红色","we":"我们","week":"周","yes":"是的","you":"你","use":"使用","with":"和…一起",
+ "this":"这个","that":"那个","check":"检查","send":"发送","good":"好的","book":"书","car":"汽车","stop":"停止","order":"订单",
+ "bird":"鸟","boy":"男孩","go":"去","my":"我的","buy":"买","look":"看","black":"黑色","drill":"钻孔","zinc":"锌","brass":"黄铜"
+};

@@ -47,8 +47,9 @@ function vClinic() {
   return `<h1>发音诊所 <small>${CL.i % total + 1} / ${total}</small></h1>${tabs}${top}
   <div class="card2 flash"><span class="tag">${esc(it.tag || (it.sent ? "句子" : "单词"))}</span>
    <div class="${it.sent ? "sent" : "bigword"}">${esc(it.w)}</div>
+   ${!it.sent && zhOf(it.w) ? `<p class="zhbig">${esc(zhOf(it.w))}</p>` : ""}
    ${it.zh ? `<p class="muted">${esc(it.zh)}</p>` : ""}
-   ${it.other ? `<p>容易混淆： <b>${esc(it.other)}</b> <button class="ic" data-say="${esc(it.other)}">🔊</button></p>` : ""}
+   ${it.other ? `<p>容易混淆： <b>${esc(it.other)}</b> <span class="muted">${esc(zhOf(it.other))}</span> <button class="ic" data-say="${esc(it.other)}">🔊</button></p>` : ""}
    ${it.tip ? `<p class="tipbox">💡 ${esc(it.tip)}</p>` : ""}
    ${hint.length ? `<p class="tipbox">${hint.map(esc).join("<br>")}</p>` : ""}
    <div class="actrow"><button data-claction="say">🔊 标准音</button><button data-claction="slow">🐢 慢速</button></div>
