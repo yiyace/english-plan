@@ -278,7 +278,8 @@ function vRead() {
   return `<h1>朗读测试 <small>仿 Reading Coach</small></h1>
   <div class="sub2">${DATA.passages.map((x, k) => `<button class="${k === i ? "on" : ""}" data-rd="${k}">${esc(x.t)}</button>`).join("")}</div>
   <div class="card2"><div class="passage">${RD.res ? wordsHtml(RD.res) : esc(p.text)}</div>
-  <div><button class="sm" data-say-slow="${esc(p.text)}">🔊 示范（慢）</button> <button class="sm" data-say="${esc(p.text)}">🔊 示范（正常）</button></div>
+  ${S.showZh !== false ? `<div class="zhbox">${esc(p.zh || "")}</div>` : ""}
+  <div><button class="sm" data-say-slow="${esc(p.text)}">🔊 示范（慢）</button> <button class="sm" data-say="${esc(p.text)}">🔊 示范（正常）</button> <button class="sm" data-act="zhtoggle">中文翻译：${S.showZh !== false ? "开" : "关"}</button></div>
   <button class="big ${RD.rec ? "rec" : ""}" data-act="readtoggle">${RD.rec ? "⏹ 读完了，点这里评分" : "🎤 开始朗读"}</button>
   ${SR ? "" : `<p class="warn">当前浏览器不支持语音识别。请用电脑上的 Edge / Chrome，或 iPhone 的 Safari。也可以手动记录：<br><input id="manacc" type="number" placeholder="准确率%" min="0" max="100"> <button class="sm" data-act="manlog">保存</button></p>`}
   <div class="res">${RD.live ? "识别到：" + esc(RD.live) : ""}${RD.res ? `<h2>准确率 ${RD.acc}%</h2><p class="muted">绿色=读对，红色=没识别到（可能没读或读错了），点 🔊 再听一遍对比。</p>` : ""}</div>
@@ -350,6 +351,7 @@ document.addEventListener("click", e => {
   if (act === "cardstart") { CS.q = dueIds().sort(() => Math.random() - .5); CS.i = 0; CS.total = CS.q.length; CS.ok = 0; CS.shown = false; CS.active = true; render(); const c = CARD[CS.q[0]]; if (c) say(c.en); }
   else if (act === "reveal") { CS.shown = true; render(); }
   else if (act === "readtoggle") readToggle();
+  else if (act === "zhtoggle") { S.showZh = S.showZh === false; save(); render(); }
   else if (act === "voicetest") say("Thank you for your inquiry. Please send me your drawing.", 0.95);
   else if (act === "manlog") { const v = +$("#manacc").value; S.logs.push({ type: "read", ref: RD.i, date: today(), acc: v, note: DATA.passages[RD.i].t }); save(); render(); }
   else if (act === "rclog") { const v = $("#rcacc").value; if (v === "") return; S.logs.push({ type: "coach", date: today(), acc: +v, note: $("#rcnote").value }); save(); render(); }
